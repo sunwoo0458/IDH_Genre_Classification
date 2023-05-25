@@ -85,6 +85,7 @@ genre_pd = pd.DataFrame.from_records(sorted(genre_dict.items(), key=lambda x:x[1
                                      columns=['genre', 'count'])
 genre_pd[:100].head()
 
+#view all genre distribution
 plot_data = [
     go.Bar(
         x=genre_pd['genre'],
@@ -100,6 +101,7 @@ fig = go.Figure(data=plot_data, layout=plot_layout)
 fig.show(renderer='colab') 
 pyoff.iplot(fig)
 
+#view top 30 genre distribution
 plot_data = [
     go.Bar(
         x=genre_pd[:30]['genre'],
@@ -115,6 +117,7 @@ fig = go.Figure(data=plot_data, layout=plot_layout)
 fig.show(renderer='colab') 
 pyoff.iplot(fig)
 
+#
 def determine_fiction(x):
     lower_list = [genre.lower() for genre in x]
     if 'fiction' in lower_list:
