@@ -11,6 +11,4 @@ Please contact @sunwooleesun on IG for help.
 #
 #
 #
-#
-#
 "Your best and wisest refuge from all troubles is in your science." -- Ada Lovelace
