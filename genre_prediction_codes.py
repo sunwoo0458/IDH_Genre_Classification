@@ -263,20 +263,20 @@ fig = go.Figure(data=plot_data, layout=plot_layout)
 fig.show(renderer='colab') 
 pyoff.iplot(fig)
 
-#
+#deciding the optimised lengths for book description
 len_df_bins=clean_book.desc_len.value_counts(bins=100, normalize=True).reset_index().sort_values(by=['index'])
 len_df_bins['cumulative']=len_df_bins.desc_len.cumsum()
 len_df_bins['index']=len_df_bins['index'].astype('str')
 len_df_bins.iplot(kind='bar', x='index', y='cumulative')
 
-min_desc_length=6
-max_desc_length=250
+min_desc_length=5
+max_desc_length=300
 
 clean_book=clean_book[(clean_book.clean_desc.str.split().apply(len)>min_desc_length)].reset_index(drop=True)
-
 clean_test=clean_test[(clean_test.clean_desc.str.split().apply(len)>min_desc_length)].reset_index(drop=True)
 clean_book.head()
 
+#unique words from all descriptions
 vocabulary=set()
 def add_to_vocab(df, vocabulary):
     for i in df.clean_desc:
@@ -287,6 +287,8 @@ def add_to_vocab(df, vocabulary):
 vocabulary=add_to_vocab(clean_book, vocabulary)
 
 vocab_dict={word: token+1 for token, word in enumerate(list(vocabulary))}
+
+#tokenizer function
 token_dict={token+1: word for token, word in enumerate(list(vocabulary))}
 
 assert token_dict[1]==token_dict[vocab_dict[token_dict[1]]]
@@ -301,13 +303,15 @@ def tokenizer(desc, vocab_dict, max_desc_length):
 
 len(vocabulary)
 
+#tokenizing the descriptions
 clean_test['desc_tokens']=clean_test['clean_desc'].apply(tokenizer, args=(vocab_dict, max_desc_length))
 clean_book['desc_tokens']=clean_book['clean_desc'].apply(tokenizer, args=(vocab_dict, max_desc_length))
-
 clean_book.head()
 
+#training the book model
 clean_book.label.value_counts()
 
+#stratified random sampling
 def stratified_split(df, target, val_percent=0.2):
     classes=list(df[target].unique())
     train_idxs, val_idxs = [], []
@@ -339,9 +343,7 @@ test_stratified(clean_book[clean_book.index.isin(sample_val_idxs)], 'label')
 
 classes=list(clean_book.label.unique())
 classes
-
 sampling=False
-
 x_train=np.stack(clean_book[clean_book.index.isin(sample_train_idxs if sampling else train_idxs)]['desc_tokens'])
 y_train=clean_book[clean_book.index.isin(sample_train_idxs if sampling else train_idxs)]['label'].apply(lambda x:classes.index(x))
 
@@ -351,6 +353,7 @@ y_val=clean_book[clean_book.index.isin(sample_val_idxs if sampling else val_idxs
 x_test=np.stack(clean_test['desc_tokens'])
 y_test=clean_test['label'].apply(lambda x:classes.index(x))
 
+#model building on Keras API
 model = Sequential()
 model.add(Embedding(len(vocabulary)+1, output_dim=250, input_length=max_desc_length))
 
@@ -376,8 +379,8 @@ def f1_m(y_true, y_pred):
 #Model 1
 parameters = {'vocab': vocabulary,
               'eval_batch_size': 30,
-              'batch_size': 200,
-              'epochs': 5,
+              'batch_size': 256,
+              'epochs': 6,
               'dropout': 0.2,
               'optimizer': 'Adam',
               'loss': 'binary_crossentropy',
@@ -404,6 +407,7 @@ def bookLSTM(x_train, y_train, x_val, y_val, params):
 
 BookMode1 = bookLSTM(x_train, y_train, x_val, y_val, parameters)
 
+#genre prediction function
 def reviewBook(model,text):
     labels = ['fiction', 'nonfiction']
     a = clean_text(description)
@@ -417,3 +421,4 @@ def reviewBook(model,text):
 description = 'put your book description here'
 
 reviewBook(BookMode1,description)
+#it should give you a prediction: either fiction or nonfiction
