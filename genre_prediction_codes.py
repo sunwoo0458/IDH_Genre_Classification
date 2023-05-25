@@ -117,7 +117,7 @@ fig = go.Figure(data=plot_data, layout=plot_layout)
 fig.show(renderer='colab') 
 pyoff.iplot(fig)
 
-#
+#fiction or nonfiction
 def determine_fiction(x):
     lower_list = [genre.lower() for genre in x]
     if 'fiction' in lower_list:
@@ -129,6 +129,7 @@ def determine_fiction(x):
 book['label'] = book['genre_list'].apply(determine_fiction)
 test['label'] = test['genre_list'].apply(determine_fiction)
 
+#remove all languages except English
 def remove_invalid_lang(df):
     invalid_desc_idxs=[]
     for i in df.index:
@@ -139,28 +140,29 @@ def remove_invalid_lang(df):
     
     df=df.drop(index=invalid_desc_idxs)
     return df
-
 book = remove_invalid_lang(book)
 test = remove_invalid_lang(test)
 test['lang']=test['book_desc'].map(lambda desc: detect(desc))
 book['lang']=book['book_desc'].map(lambda desc: detect(desc))
 book.head()
 
+#bring in ISO language codes
 lang_lookup = pd.read_html('https://en.wikipedia.org/wiki/List_of_ISO_639-1_codes')[1]
 langpd = lang_lookup[['ISO language name','639-1']]
 langpd.columns = ['language','iso']
 langpd
 
+#
 def desc_lang(x):
     if x in list(langpd['iso']):
         return langpd[langpd['iso'] == x]['language'].values[0]
     else:
         return 'nil'
 book['language'] = book['lang'].apply(desc_lang)
-book.head(11)
-
+book.head()
 test['language'] = test['lang'].apply(desc_lang)
 
+#
 plot_data = [
     go.Histogram(
         x=book['language']
@@ -175,6 +177,7 @@ fig = go.Figure(data=plot_data, layout=plot_layout)
 fig.show(renderer='colab')
 pyoff.iplot(fig)
 
+#show non-English books and their distribution
 nonen_books = book[book['language']!='English']
 plot_data = [
     go.Histogram(
