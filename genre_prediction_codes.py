@@ -152,7 +152,7 @@ langpd = lang_lookup[['ISO language name','639-1']]
 langpd.columns = ['language','iso']
 langpd
 
-#
+#filter out non-English books in the dataframe
 def desc_lang(x):
     if x in list(langpd['iso']):
         return langpd[langpd['iso'] == x]['language'].values[0]
@@ -162,7 +162,7 @@ book['language'] = book['lang'].apply(desc_lang)
 book.head()
 test['language'] = test['lang'].apply(desc_lang)
 
-#
+#show distribution for languages
 plot_data = [
     go.Histogram(
         x=book['language']
@@ -193,20 +193,22 @@ fig = go.Figure(data=plot_data, layout=plot_layout)
 fig.show(renderer='colab') 
 pyoff.iplot(fig)
 
+#cleaning texts
 test = test[test['language']=='English']
 en_books = book[book['language']=='English']
 
+#English books only
 en_books.to_csv('/checkpoint.csv')
 test.to_csv('/testcheckpoint.csv')
 en_book_path = '/checkpoint.csv'
 test_check_path = '/testcheckpoint.csv'
 
 en_books = pd.read_csv(en_book_path)
-en_books
+en_books.head()
 
+#tidying the text
 def _removeNonAscii(s): 
     return "".join(i for i in s if ord(i)<128)
-
 def clean_text(text):
     text = text.lower()
     text = re.sub(r"what's", "what is ", text)
@@ -242,11 +244,26 @@ def cleaner(df):
 clean_book = cleaner(en_books)
 clean_test = cleaner(test)
 
+#preview the newly cleaned text data
+clean_book['desc_len'] = [len(i.split()) for i in clean_book.clean_desc]
 clean_book.head()
 
-clean_book['desc_len'] = [len(i.split()) for i in clean_book.clean_desc]
-clean_book.head(3)
+#see the length of book descriptions
+plot_data = [
+    go.Histogram(
+        x=clean_book['desc_len']
+    )
+]
+plot_layout = go.Layout(
+        title='Distribution of description length',
+        yaxis= {'title': "Length"},
+        xaxis= {'title': "Descriptions"}
+    )
+fig = go.Figure(data=plot_data, layout=plot_layout)
+fig.show(renderer='colab') 
+pyoff.iplot(fig)
 
+#
 len_df_bins=clean_book.desc_len.value_counts(bins=100, normalize=True).reset_index().sort_values(by=['index'])
 len_df_bins['cumulative']=len_df_bins.desc_len.cumsum()
 len_df_bins['index']=len_df_bins['index'].astype('str')
