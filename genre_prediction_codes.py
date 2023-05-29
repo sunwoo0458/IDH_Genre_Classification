@@ -1,4 +1,4 @@
-# loading required libraries
+# loading and installing required libraries
 !pip install langdetect
 from collections import defaultdict
 import cufflinks as cf
@@ -20,11 +20,11 @@ from keras.layers import LSTM
 pyoff.init_notebook_mode()
 cf.go_offline()
 
-#mounting google drive onto colab
+#mounting google drive onto colab (not necessary)
 from google.colab import drive
 drive.mount('/content/drive')
 
-#bringing in data
+#bringing in data #please re-specify your file directory
 bookdata_path = '/content/drive/MyDrive/Colab Notebooks/book_data.csv'
 testdata_path = '/content/drive/MyDrive/Colab Notebooks/test_data.csv'
 book = pd.read_csv(bookdata_path , engine = 'python' , encoding='utf-8' , error_bad_lines=False)
