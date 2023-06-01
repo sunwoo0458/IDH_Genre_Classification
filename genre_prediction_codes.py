@@ -376,10 +376,10 @@ def f1_m(y_true, y_pred):
     recall = recall_m(y_true, y_pred)
     return 2*((precision*recall)/(precision+recall+K.epsilon()))
 
-#Model 1
+#Model 1 ; play around with epochs, eval_batch_size, and dropout
 parameters = {'vocab': vocabulary,
               'eval_batch_size': 30,
-              'batch_size': 256,
+              'c': 256,
               'epochs': 6,
               'dropout': 0.2,
               'optimizer': 'Adam',
