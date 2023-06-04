@@ -268,6 +268,8 @@ len_df_bins=clean_book.desc_len.value_counts(bins=100, normalize=True).reset_ind
 len_df_bins['cumulative']=len_df_bins.desc_len.cumsum()
 len_df_bins['index']=len_df_bins['index'].astype('str')
 len_df_bins.iplot(kind='bar', x='index', y='cumulative')
+fig.show(renderer='colab') 
+pyoff.iplot(fig)
 
 min_desc_length=5
 max_desc_length=300
