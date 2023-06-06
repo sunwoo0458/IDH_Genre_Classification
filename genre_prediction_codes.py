@@ -101,22 +101,6 @@ fig = go.Figure(data=plot_data, layout=plot_layout)
 fig.show(renderer='colab') 
 pyoff.iplot(fig)
 
-#view top 30 genre distribution
-plot_data = [
-    go.Bar(
-        x=genre_pd[:30]['genre'],
-        y=genre_pd[:30]['count']
-    )
-]
-plot_layout = go.Layout(
-        title='Top 30 genres',
-        yaxis= {'title': "Count"},
-        xaxis= {'title': "Genre"}
-    )
-fig = go.Figure(data=plot_data, layout=plot_layout)
-fig.show(renderer='colab') 
-pyoff.iplot(fig)
-
 #fiction or nonfiction
 def determine_fiction(x):
     lower_list = [genre.lower() for genre in x]
@@ -175,22 +159,6 @@ plot_layout = go.Layout(
     )
 fig = go.Figure(data=plot_data, layout=plot_layout)
 fig.show(renderer='colab')
-pyoff.iplot(fig)
-
-#show non-English books and their distribution
-nonen_books = book[book['language']!='English']
-plot_data = [
-    go.Histogram(
-        x=nonen_books['language']
-    )
-]
-plot_layout = go.Layout(
-        title='Distribution for non English books',
-        yaxis= {'title': "Count"},
-        xaxis= {'title': "Language"}
-    )
-fig = go.Figure(data=plot_data, layout=plot_layout)
-fig.show(renderer='colab') 
 pyoff.iplot(fig)
 
 #cleaning texts
